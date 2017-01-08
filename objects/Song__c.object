@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>false</enableReports>
+    <enableSearch>false</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <fields>
+        <fullName>Artist__c</fullName>
+        <externalId>false</externalId>
+        <label>Artist</label>
+        <length>180</length>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Genre__c</fullName>
+        <externalId>false</externalId>
+        <label>Genre</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+        <valueSet>
+            <restricted>true</restricted>
+            <valueSetDefinition>
+                <sorted>false</sorted>
+                <value>
+                    <fullName>Alternative Music</fullName>
+                    <default>true</default>
+                </value>
+                <value>
+                    <fullName>Blues</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Classical Music</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Country Music</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Dance Music</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Easy Listening</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Hip Hop / Rap</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Indie Pop</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Jazz</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Latin Music</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>new Age</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Opera</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Pop (Popular music)</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>R&amp;B / Soul</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Reggae</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>Rock</fullName>
+                    <default>false</default>
+                </value>
+                <value>
+                    <fullName>World Music / Beats</fullName>
+                    <default>false</default>
+                </value>
+            </valueSetDefinition>
+        </valueSet>
+    </fields>
+    <fields>
+        <fullName>Length_m__c</fullName>
+        <externalId>false</externalId>
+        <label>Length (m)</label>
+        <precision>18</precision>
+        <required>true</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Track_Count__c</fullName>
+        <externalId>false</externalId>
+        <label>Track Count</label>
+        <precision>18</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Track_Licences__c</fullName>
+        <externalId>false</externalId>
+        <label>Track Licences</label>
+        <precision>18</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <label>Song</label>
+    <nameField>
+        <label>Song Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Songs</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>ReadWrite</sharingModel>
+    <validationRules>
+        <fullName>Check_licence</fullName>
+        <active>true</active>
+        <errorConditionFormula>Track_Count__c  &gt;=  Track_Licences__c</errorConditionFormula>
+        <errorDisplayField>Track_Licences__c</errorDisplayField>
+        <errorMessage>Amount of tracks cannot exceed the number of available track licenses.</errorMessage>
+    </validationRules>
+</CustomObject>

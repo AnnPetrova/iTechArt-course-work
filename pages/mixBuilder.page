@@ -1,0 +1,75 @@
+<apex:page standardController="Mix__c" extensions="MixBuilderController">
+    <apex:image url="http://www.grooving.ru.com/grooving/bigimg/nophoto/nopic.png" height="70px"/>
+    <h2>Mix Builder</h2>
+    <p>Workout Mix</p>
+
+    <apex:form  rendered="true">
+        <apex:pageBlock>
+            <apex:pageBlockButtons location="top">
+                <h2>Mix Builder</h2>
+                <apex:commandButton value="Save" action="{!save}"/>
+                <apex:commandButton value="Cancel" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:message/>
+
+            <apex:pageBlockSection title="Mix Details">
+                <apex:inputField value="{!mix.Name}" required="true"/>
+                <apex:inputField value="{!mix.Customer__c}" required="true"/>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Mix Summary" id="mixDescription">
+                <apex:outputText title="Track Count" value=" {!trackCount} " rendered="true" id="trackCount">
+                    Track Count
+                </apex:outputText>
+                <apex:outputText title="Mix Length(m)" value=" {!mixLength} ">
+                    Mix Length(m)
+                </apex:outputText>
+                <apex:outputText title="Remaining Tracks" value=" {!remainingTracks} ">
+                    Remaining Tracks
+                </apex:outputText>
+                <apex:outputText title="Remaining Mix Length(m)" value=" {!remainingMixLength} ">
+                    Remaining Mix Length(m)
+                </apex:outputText>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Songs" columns="1">
+
+                <apex:selectList id="Genre" value="{!genre}" size="1" multiselect="true" readonly="false"
+                                 title="Song Genre Filter">
+                    <apex:selectOptions value="{!genres}"/>
+                    <apex:actionSupport event="onchange" reRender="listOfSongs"/>
+                </apex:selectList>
+
+                <apex:pageBlockTable id="listOfSongs" value="{!songs}" var="song">
+                    <apex:column headerValue="Select">
+                        <apex:inputCheckbox value="{!song.isChosen}"/>
+                    </apex:column>
+                    <apex:column headerValue="Song Name">
+                        <apex:facet name="songName">Song Name</apex:facet>
+                        <apex:outputText value="{!song.song.Name}"/>
+                    </apex:column>
+                    <apex:column headerValue="Genre">
+                        <apex:facet name="genre">Genre</apex:facet>
+                        <apex:outputText value="{!song.song.Genre__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Length (m)">
+                        <apex:facet name="length">Length (m)</apex:facet>
+                        <apex:outputText value="{!song.song.length_m__c}"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Save" action="{!save}"/>
+                <apex:commandButton value="Cancel" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+
+    <!--  <apex:form>
+         <apex:panelGrid columns="2">
+                         <apex:commandLink action="{!previous}">Previous</apex:commandLink>
+                         <apex:commandLink action="{!next}">Next</apex:commandLink>
+                     </apex:panelGrid>
+      </apex:form>-->
+</apex:page>
