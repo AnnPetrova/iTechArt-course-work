@@ -1,0 +1,16 @@
+Name,Artist__c, Genre__c,Length_m__c , Track_Count__c , Track_Licences__c
+test1, artist1, Blues, 3.0, 0, 21
+test2, artist2, Blues, 3.5, 0, 12
+test3, artist3, Blues, 2.0, 0, 7
+test4, artist3, Blues, 1.11, 0, 3
+test5, artist4, Rock, 1.11, 0, 5
+test6, artist4, Rock, 1.11, 0, 5
+test7, artist4, Rock, 1.11, 0, 5
+test8, artist4, Rock, 1.11, 0, 5
+test9, artist4, Rock, 1.11, 0, 5
+test10, artist4, Rock, 1.11, 0, 5
+test11, artist4, Rock, 4.32, 0, 4
+test12, artist4, Rock, 4.32, 0, 12
+test13, artist13, Rock, 4.32, 0, 11
+test14, artist4, Rock, 2.32, 0, 18
+test15, artist4, Rock, 2.19, 0, 20

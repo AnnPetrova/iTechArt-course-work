@@ -7,7 +7,6 @@ trigger OnTrackTrigger on Track__c (after insert, after update, after delete, af
         for (Track__c t: Trigger.New) {
             songIds.add(t.Song__c);
             mixIds.add(t.Mix__c);
-            TrackTriggerHandler.defineGenre(mixIds, Trigger.new);
         }
     } else if (trigger.isUpdate) {
         for (Track__c t: Trigger.New) {
@@ -25,4 +24,5 @@ trigger OnTrackTrigger on Track__c (after insert, after update, after delete, af
         }
     }
     TrackTriggerHandler.calculateTracks(songIds);
+    TrackTriggerHandler.defineGenre(mixIds);
 }
