@@ -1,188 +1,216 @@
-public  class MixBuilderController{
+public  class MixBuilderController
+{
 	private static final Integer TRACK_COUNT = 0;
-	private static final Double MIX_LENGTH = 0;
 	private static final Integer REMAINING_TRACKS = 20;
+	private static final Double MIX_LENGTH = 0;
 	private static final Double REMAINING_LENGTH = 90.0;
 	@testVisible private static final Integer NUMBER_OF_RECORDS = 5;
-
-	private ApexPages.StandardSetController stdSetController;
-	@testVisible private Map <Id, Song__c> tracksPerMix;
-	private String query = 'select id,Name,Genre__c,Length_m__c from Song__c';
+	@testVisible private ApexPages.StandardSetController stdSetController;
+	@testVisible private Map <Id, Song__c> addedSongs;
 	@testVisible private List<SongWrapper> wrappedSongs;
-	public Mix__c mix {	get; private set;}
-	public List<SelectOption> genresPicklist;
-	public String genre {get; set;}
-	public Integer trackCount {	get; set;}
+	private String  query;
+	public Mix__c mix {get; private set;}
+	public String currentGenre {get; set;}
+	public Integer trackCount {get; set;}
 	public Double mixLength {get;set;}
 	public Integer remainingTracks {get; set;}
 	public Double remainingMixLength {get;set;}
-	public integer pageNumber{
-		get{
+	public List<SelectOption> genresPicklist
+	{
+		get
+		{
+			genresPicklist = Utils.getPicklistValues(new Song__c(), 'Genre__c');
+			genresPicklist.add(0,new SelectOption('--Any Genre--', '--Any Genre--'));
+			return genresPicklist;
+		}
+		private set;
+	}
+	public integer pageNumber
+	{
+		get
+		{
 			return stdSetController.getPageNumber();
 		}
 		set;
 	}
-	public Integer totalPages{
-		get{
+	public Integer totalPages
+	{
+		get
+		{
 			Integer total = (Integer)(stdSetController.getResultSize() / ((Decimal)NUMBER_OF_RECORDS)).round(
 					System.RoundingMode.CEILING);
-			return ( total == 0) ? 1 : total;
+			return (total == 0) ? 1 : total;
 		}
 		set;
 	}
-	public MixBuilderController(ApexPages.StandardController acon) {
+
+	public MixBuilderController(ApexPages.StandardController acon)
+	{
 		Id mixId = ApexPages.currentPage().getParameters().get('id');
+		mix = (mixId == null) ? new Mix__c() : (Mix__c)acon.getRecord();
 
+		query = 'select id, Name, Genre__c, Length_m__c from Song__c';
 		stdSetController = new ApexPages.StandardSetController(Database.query(query));
-
 		stdSetController.setpagesize(NUMBER_OF_RECORDS);
-		tracksPerMix = new Map <id,Song__c>();
-
-		mix = (mixId == null) ? new Mix__c() : [select id,Name, Customer__c from Mix__c where Id = :mixId];
-
-		for (Song__c s : [select Name,Genre__c,Length_m__c from Song__c where Id in
-		                (select Song__c from Track__c where Mix__c =: mixId)] ) {
-			tracksPerMix.put(s.Id, s);
+		addedSongs = new Map <id, Song__c>();
+		for (Song__c s	:	[select Name, Genre__c, Length_m__c from Song__c where Id in
+			(select Song__c from Track__c where Mix__c =: mixId)])
+		{
+			addedSongs.put(s.Id, s);
 		}
-
+		currentGenre = '--Any Genre--';
 		getSongs();
 		initializeMixInfo();
-
-		genre = '--Any Genre--';
-		genresPicklist = getPicklistValues(new Song__c(), 'Genre__c');
 	}
 
-	public List<SelectOption> getGenresPicklist() {
-		genresPicklist.add(0, new SelectOption('--Any Genre--', '--Any Genre--'));
-		return genresPicklist;
-	}
-
-	public void updateMixInfo() {
-		for (SongWrapper sw: wrappedSongs) {
-			if (sw.isChosen == true && !tracksPerMix.containsKey(sw.song.Id))
-			{
-				tracksPerMix.put(sw.song.Id, sw.song);
-				mixLength += sw.song.Length_m__c;
-				remainingMixLength -=sw.song.Length_m__c;
-			} else if (sw.isChosen == false && tracksPerMix.containsKey(sw.song.Id))
-			{
-				tracksPerMix.remove(sw.song.Id);
-				mixLength -= sw.song.Length_m__c;
-				remainingMixLength+= sw.song.Length_m__c;
-			}
-		}
-		trackCount = tracksPerMix.size();
-		remainingTracks = REMAINING_TRACKS - tracksPerMix.size();
-	}
-
-	public void initializeMixInfo() {
-		getSelectedSongs();
-		trackCount = tracksPerMix.size();
-		mixLength = MIX_LENGTH;
-		remainingTracks = REMAINING_TRACKS - tracksPerMix.size();
-		remainingMixLength = REMAINING_LENGTH;
-		for (Song__c s: tracksPerMix.values()) {
-			mixLength += s.Length_m__c;
-			remainingMixLength -= s.Length_m__c;
-		}
-	}
-
-	private static list<SelectOption> getPicklistValues(SObject obj, String fld) {
-		List<SelectOption> options = new list<SelectOption>();
-		Schema.sObjectType objType = obj.getSObjectType();
-		Schema.DescribeSObjectResult objDescribe = objType.getDescribe();
-		map<String, Schema.SObjectField> fieldMap = objDescribe.fields.getMap();
-
-		List<Schema.PicklistEntry> values =
-				fieldMap.get(fld).getDescribe().getPickListValues();
-
-		for (Schema.PicklistEntry a : values) {
-			options.add(new SelectOption(a.getLabel(), a.getValue()));
-		}
-		return options;
-	}
-
-	public void getSelectedSongs() {
-		if (wrappedSongs != null)
-			for (SongWrapper sw : wrappedSongs)
-				if (sw.isChosen == true)
-					tracksPerMix.put(sw.song.id, sw.song);
-				else
-					tracksPerMix.remove(sw.song.id);
-	}
-
-	public List<SongWrapper> getSongs() {
+	public List<SongWrapper> getSongs()
+	{
 		getSelectedSongs();
 		wrappedSongs = new List <SongWrapper>();
-		for (Song__c song : (List<Song__c>)stdSetController.getRecords()) {
-			if (tracksPerMix.ContainsKey(song.id)) {
+		for (Song__c song : (List<Song__c>)stdSetController.getRecords())
+		{
+			if (addedSongs.ContainsKey(song.id))
+			{
 				wrappedSongs.add(new SongWrapper(song, true));
-			} else {
+			}
+			else
+			{
 				wrappedSongs.add(new SongWrapper(song, false));
 			}
 		}
 		return wrappedSongs;
 	}
 
-	public void songsFiltration() {
-		if (genre.equals('--Any Genre--')) {
-			query = 'select id,Name,Genre__c,Length_m__c from Song__c';
+	private void getSelectedSongs()
+	{
+		if (wrappedSongs != null)
+		{
+			for (SongWrapper sw : wrappedSongs)
+			{
+				if (sw.isChosen == true)
+				{
+					addedSongs.put(sw.song.id, sw.song);
+				}
+				else
+				{
+					addedSongs.remove(sw.song.id);
+				}
+			}
 		}
-		else {
-			query = 'select id,Name,Genre__c,Length_m__c from Song__c where Genre__c=\'' + genre + '\'';
+	}
+
+	public void initializeMixInfo()
+	{
+		trackCount = addedSongs.size();
+		mixLength = MIX_LENGTH;
+		remainingTracks = REMAINING_TRACKS - addedSongs.size();
+		remainingMixLength = REMAINING_LENGTH;
+		for (Song__c s: addedSongs.values())
+		{
+			mixLength += s.Length_m__c;
+			remainingMixLength -= s.Length_m__c;
+		}
+	}
+
+	public void filterByGenre()
+	{
+		if (currentGenre.equals('--Any Genre--'))
+		{
+			query = 'select id, Name, Genre__c, Length_m__c from Song__c';
+		}
+		else
+		{
+			query = 'select id, Name, Genre__c, Length_m__c from Song__c where Genre__c=\'' + currentGenre + '\'';
 		}
 		stdSetController = new ApexPages.StandardSetController(Database.query(query));
 		stdSetController.setpagesize(NUMBER_OF_RECORDS);
 		pageNumber = stdSetController.getPageNumber();
-		totalPages =
-		(Integer)(stdSetController.getResultSize() / ((Decimal)NUMBER_OF_RECORDS)).round(System.RoundingMode.CEILING);
+		totalPages = (Integer)
+				(stdSetController.getResultSize() / ((Decimal)NUMBER_OF_RECORDS)).round(System.RoundingMode.CEILING);
 	}
 
-	public PageReference save() {
+	public void updateMixInfo()
+	{
+		for (SongWrapper sw: wrappedSongs)
+		{
+			if (sw.isChosen == true && !addedSongs.containsKey(sw.song.Id))
+			{
+				addedSongs.put(sw.song.Id, sw.song);
+				mixLength += sw.song.Length_m__c;
+				remainingMixLength -= sw.song.Length_m__c;
+			}
+			else if (sw.isChosen == false && addedSongs.containsKey(sw.song.Id))
+			{
+				addedSongs.remove(sw.song.Id);
+				mixLength -= sw.song.Length_m__c;
+				remainingMixLength += sw.song.Length_m__c;
+			}
+		}
+		trackCount = addedSongs.size();
+		remainingTracks = REMAINING_TRACKS - addedSongs.size();
+	}
 
+	public PageReference save()
+	{
 		List<Track__c> tracks = new List<Track__c>();
-		try {
-			if (this.remainingMixLength > REMAINING_LENGTH) {
-				ApexPages.addMessage(
-						new ApexPages.Message(ApexPages.Severity.ERROR,'The maximum mix length is 90.0 minutes'));
-			} else if (this.trackCount > REMAINING_TRACKS) {
-				ApexPages.addMessage(
-						new ApexPages.Message(ApexPages.Severity.ERROR,'You can choose no more than 20 tracks.'));
-			} else {
+		Savepoint sp = Database.setSavepoint();
+		try
+		{
+			if (mixLength > REMAINING_LENGTH)
+			{
+				ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR,
+										'The maximum mix length is ' + REMAINING_LENGTH + ' minutes'));
+				return null;
+			}
+			else if (trackCount > REMAINING_TRACKS)
+			{
+				ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR,
+										'You can choose no more than ' + REMAINING_TRACKS + ' tracks.'));
+				return null;
+			}
+			else
+			{
 				upsert mix;
 				delete([select Id from Track__c where Mix__c = :mix.Id]);
-
-				for (Song__c s: tracksPerMix.values()) {
+				for (Song__c s: addedSongs.values())
+				{
 					tracks.add(new Track__c(Mix__c = mix.Id, Song__c = s.id));
 				}
 				insert tracks;
 			}
-		} catch (DmlException e) {
-			ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR,e.getMessage()));
+		}
+		catch (DmlException e)
+		{
+			Database.rollback(sp);
+			ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, e.getMessage()));
 			return null;
 		}
-
 		PageReference redirectSuccess = new ApexPages.StandardController(mix).view();
 		return redirectSuccess;
 	}
 
-	public PageReference cancel() {
+	public PageReference cancel()
+	{
 		return stdSetController.cancel();
 	}
 
-	public void first() {
+	public void first()
+	{
 		stdSetController.first();
 	}
 
-	public void previous() {
+	public void previous()
+	{
 		stdSetController.previous();
 	}
 
-	public void next() {
+	public void next()
+	{
 		stdSetController.next();
 	}
 
-	public void last() {
+	public void last()
+	{
 		stdSetController.last();
 	}
 }

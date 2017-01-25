@@ -1,6 +1,3 @@
-/**
- * Created by user on 05.01.2017.
- */
 @testVisible
 public class SongWrapper {
 	public Boolean isChosen {get;set;}

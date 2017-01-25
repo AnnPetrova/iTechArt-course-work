@@ -1,13 +1,14 @@
 <apex:page standardController="Mix__c" extensions="MixBuilderController">
-    <div style="display: inline">
-        <apex:image style="width:60px" value="{!$Resource.MixBuilder}" title="Mix Builder"
-                    rendered="{!Mix.Name!=null}"/>
-      <!--  <apex:outputText value="{!Mix.Name}" />-->
-        <apex:image style="width:60px" value="{!$Resource.MixBuilder}" title="Mix Builder" rendered="{!Mix.Name==null}">
-        </apex:image>
-    </div>
+    <apex:panelGrid columns="2">
+        <apex:image style="width:60px" value="{!$Resource.MixBuilder}" title="Mix Builder"/>
+        <apex:panelGrid columns="1">
+            <apex:outputText style="font-size: 26px;" value="{!Mix.Name}" rendered="{!Mix.Name!=null}"/>
+            <apex:outputText style="font-size: 26px;" value="New Mix" rendered="{!Mix.Name==null}"/>
+            <apex:outputText value="Workout Mix"/>
+        </apex:panelGrid>
+    </apex:panelGrid>
     <apex:form id="mainForm">
-        <apex:pageBlock title="Mix Builder">
+        <apex:pageBlock title="Mix Builder" mode="Edit">
             <apex:pageMessages />
 
             <apex:pageBlockButtons location="top">
@@ -16,8 +17,8 @@
             </apex:pageBlockButtons>
 
             <apex:pageBlockSection title="Mix Details">
-                <apex:inputField value="{!mix.Name}" required="true"/>
-                <apex:inputField value="{!mix.Customer__c}" required="true"/>
+                <apex:inputField value="{!Mix__c.Name}" required="true"/>
+                <apex:inputField value="{!Mix__c.Customer__c}" required="true"/>
             </apex:pageBlockSection>
 
             <apex:pageBlockSection title="Mix Summary" id="mixDescription" showHeader="true">
@@ -34,20 +35,25 @@
             <apex:pageBlockSection title="Songs" columns="1" id="pbSection">
                 <apex:panelGrid columns="3">
                     <apex:outputLabel value="Song Genre Filter: "/>
-                    <apex:selectList id="Genre" value="{!genre}" size="1" multiselect="false" readonly="false"
-                                     title="Song Genre Filter">
-                        <apex:actionSupport event="onchange" action="{!songsFiltration}" reRender="pbSection, pbButtons"/>
-                        <apex:selectOptions value="{!genresPicklist}"/>
-                    </apex:selectList>
+                    <apex:actionRegion >
+                        <apex:selectList id="Genre" value="{!currentGenre}" size="1" multiselect="false" readonly="false"
+                                         title="Song Genre Filter">
+                            <apex:actionSupport event="onchange" action="{!filterByGenre}"
+                                                reRender="pbSection, pbButtons"/>
+                            <apex:selectOptions value="{!GenresPicklist}"/>
+                        </apex:selectList>
+                    </apex:actionRegion>
                     <apex:actionStatus style="font-weight: 900; " startText="Loading..."
                                        id="statusInfo"/>
                 </apex:panelGrid>
                 <apex:pageBlockTable id="listOfSongs" value="{!Songs}" var="song">
                     <apex:column headerValue="Select">
-                        <apex:inputCheckbox value="{!song.isChosen}">
-                            <apex:actionSupport event="onchange" action="{!updateMixInfo}" reRender="mixDescription"
-                                                status="statusInfo"/>
-                        </apex:inputCheckbox>
+                        <apex:actionRegion >
+                            <apex:inputCheckbox value="{!song.isChosen}">
+                                <apex:actionSupport event="onchange" action="{!updateMixInfo}" reRender="mixDescription"
+                                                    status="statusInfo"/>
+                            </apex:inputCheckbox>
+                        </apex:actionRegion>
                     </apex:column>
                     <apex:column headerValue="Song Name">
                         <apex:facet name="songName">Song Name</apex:facet>
@@ -64,27 +70,30 @@
                 </apex:pageBlockTable>
             </apex:pageBlockSection>
 
-            <center><apex:panelGroup id="pbButtons" rendered="true">
-                <apex:commandButton value="|<First" status="statusInfo" action="{!first}" disabled="{!pageNumber==1}"
-                                    reRender="pbSection, pbButtons"/>
-                <apex:commandButton value="<Previous" status="statusInfo" action="{!previous}"
-                                    disabled="{!pageNumber==1}"
-                                    reRender="pbSection, pbButtons"/>
-                <apex:outputText >Page {!pageNumber} of {!totalPages}</apex:outputText>
-                <apex:commandButton value="Next>" status="statusInfo" action="{!next}"
-                                    disabled="{!pageNumber==totalPages}"
-                                    reRender="pbSection, pbButtons"/>
-                <apex:commandButton value="Last>|" status="statusInfo" action="{!last}"
-                                    disabled="{!pageNumber==totalPages}"
-                                    reRender="pbSection, pbButtons"/>
-            </apex:panelGroup></center>
+            <center>
+                <apex:panelGroup id="pbButtons" rendered="true">
+                    <apex:actionRegion >
+                        <apex:commandButton value="|<First" status="statusInfo" action="{!first}"
+                                            disabled="{!pageNumber==1}"
+                                            reRender="pbSection, pbButtons"/>
+                        <apex:commandButton value="<Previous" status="statusInfo" action="{!previous}"
+                                            disabled="{!pageNumber==1}"
+                                            reRender="pbSection, pbButtons"/>
+                        <apex:outputText >Page {!pageNumber} of {!totalPages}</apex:outputText>
+                        <apex:commandButton value="Next>" status="statusInfo" action="{!next}"
+                                            disabled="{!pageNumber==totalPages}"
+                                            reRender="pbSection, pbButtons"/>
+                        <apex:commandButton value="Last>|" status="statusInfo" action="{!last}"
+                                            disabled="{!pageNumber==totalPages}"
+                                            reRender="pbSection, pbButtons"/>
+                    </apex:actionRegion>
+                </apex:panelGroup>
+            </center>
 
             <apex:pageBlockButtons location="bottom">
                 <apex:commandButton value="Save" action="{!save}" reRender="mainForm"/>
                 <apex:commandButton value="Cancel" action="{!cancel}" immediate="true"/>
             </apex:pageBlockButtons>
         </apex:pageBlock>
-
     </apex:form>
-
 </apex:page>
